@@ -62,9 +62,6 @@ jobs:
         
       - name: Run Playwright Tests
         env:
-          USERNAME_FOR_GITHUB: ${{vars.USERNAME_FOR_GITHUB}}
-          PASSWORD_FOR_GITHUB: ${{secrets.PASSWORD_FOR_GITHUB}}
-          MFA_SECRET_FOR_GITHUB: ${{secrets.MFA_SECRET_FOR_GITHUB}}
           USER_EMAIL: ${{vars.USER_EMAIL}}
           HEADLESS: 'true'
         run: npx playwright test --project chromium

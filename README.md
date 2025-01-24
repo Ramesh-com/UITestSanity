@@ -1,7 +1,6 @@
-# Composio GitHub Integration Automation
+# Composio Regression Tests Automation
 
-This project automates the process of connecting a GitHub account with the Composio platform using Playwright. The setup includes Gmail OAuth for handling email verification and GitHub credentials for authorizing your account.
-
+This peoject automates the regression test cases to perform the daily regression to check all the possible business use-case scenarios in order to check, if the has not any broken scenarios.
 ## Prerequisites
 
 1. **Node.js**: Make sure you have Node.js installed. You can download it from [here](https://nodejs.org/).
@@ -11,8 +10,8 @@ This project automates the process of connecting a GitHub account with the Compo
 
 ### 1. Clone the Repository
 
-git clone https://github.com/yourusername/composio-github-integration.git
-   - cd composio-github-integration
+git clone https://github.com/ramesh-com/uitestsanity.git
+   - cd uitestsanity
 
 ### 2. Install Dependencies
    - npm install
@@ -21,9 +20,6 @@ git clone https://github.com/yourusername/composio-github-integration.git
 
 Create a `.env` file in the root directory with the following content:
 
- - USERNAME_FOR_GITHUB = <your_github_username>
- - PASSWORD_FOR_GITHUB = <your_github_password>
- - MFA_SECRET_FOR_GITHUB = <your_2fa_secret_code>
  - USER_EMAIL= <your_email_id>
  - HEADLESS= <'true / false '>  # 'true' for headless and 'false' for headed mode
 
@@ -48,10 +44,7 @@ You need to configure Gmail OAuth to handle email verification.
 You can run the tests using the following command:
 
 - To run in chrome browser 
-    - npx playwright test --project chromium 
-
-- To run test in multiple browser 
-    - npx playwright test 
+    - npx playwright test  
 
 ### 6. View Test Results
 Test results are automatically generated in the `test-results/` folder. You can also view the HTML report using:
