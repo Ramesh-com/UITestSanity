@@ -94,7 +94,7 @@ jobs:
             \"text\": \"CI/CD Pipeline ${STATUS}\",
             \"attachments\": [
               {
-                \"text\": \"Job Status: ${STATUS}\\nBranch: ${{ github.ref_name }}\\nCommit: ${{ github.sha }}\\nTriggered By: ${{ github.actor }}\",
+                \"text\": \"Job Status: ${STATUS}\\nBranch: ${{ github.ref_name }}\\nCommit: ${{ github.sha }}\\nTriggered By: ${{ github.actor }}\\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nWorkflow: ${{ github.workflow }}\nJob: ${{ github.job }}\",
                 \"color\": \"$([[ ${{ job.status }} == 'failure' ]] && echo 'danger' || echo 'good')\"
               }
             ]
