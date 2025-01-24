@@ -79,3 +79,23 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
+
+        # Notify Slack
+      - name: Notify Slack
+        if: always() # Ensures notification is sent regardless of success or failure
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          STATUS="Success"
+          if [[ ${{ job.status }} == 'failure' ]]; then
+            STATUS="Failure"
+          fi
+          curl -X POST -H 'Content-type: application/json' --data "{
+            \"text\": \"CI/CD Pipeline ${STATUS}\",
+            \"attachments\": [
+              {
+                \"text\": \"Job Status: ${STATUS}\\nBranch: ${{ github.ref_name }}\\nCommit: ${{ github.sha }}\\nTriggered By: ${{ github.actor }}\",
+                \"color\": \"$([[ ${{ job.status }} == 'failure' ]] && echo 'danger' || echo 'good')\"
+              }
+            ]
+          }" $SLACK_WEBHOOK_URL
