@@ -72,23 +72,6 @@ const { launchBrowser } = require('./browserSingleton');
         }
     }    
 
-    // async function performLogin() {
-    //     const page = await launchBrowser();
-    //     const APP_URL = "https://app.composio.dev";
-        
-    //     await page.goto(APP_URL);
-    //     const loginPage = new LoginPage(page);
-    //     await loginPage.enterUserMailAddress(process.env.USER_EMAIL);
-    //     await loginPage.clickSendLogInLinkButton();
-        
-    //     await page.waitForLoadState('load');
-    //     const client = await authorize();
-    //     const signInLink = await getSignInLink(client);
-    //     await page.goto(signInLink);
-        
-    //     return page;
-    // }
-
     async function isElementVisible(page, locator) {
         try {
             const element = await page.$(locator);

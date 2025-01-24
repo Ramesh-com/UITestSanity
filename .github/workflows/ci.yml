@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   schedule:
-    - cron: "0 */3 * * *" # Every 3 hours
+    - cron: "0 */3 * * *" 
   push:
     branches: [main]
   pull_request:
@@ -80,22 +80,31 @@ jobs:
           name: playwright-report
           path: playwright-report/
 
-        # Notify Slack
+      - name: Generate Playwright Report URL
+        if: always()
+        run: echo "PLAYWRIGHT_REPORT_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
+  
       - name: Notify Slack
         if: always() # Ensures notification is sent regardless of success or failure
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          PLAYWRIGHT_REPORT_URL: ${{ env.PLAYWRIGHT_REPORT_URL }}
+          TEST_ENVIRONMENT_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" 
         run: |
           STATUS="Success"
+          COLOR="good"
           if [[ ${{ job.status }} == 'failure' ]]; then
             STATUS="Failure"
+            COLOR="danger"
           fi
           curl -X POST -H 'Content-type: application/json' --data "{
             \"text\": \"CI/CD Pipeline ${STATUS}\",
             \"attachments\": [
               {
-                \"text\": \"Job Status: ${STATUS}\\nBranch: ${{ github.ref_name }}\\nCommit: ${{ github.sha }}\\nTriggered By: ${{ github.actor }}\",
-                \"color\": \"$([[ ${{ job.status }} == 'failure' ]] && echo 'danger' || echo 'good')\"
+                \"title\": \"Playwright Test Report\",
+                \"title_link\": \"${PLAYWRIGHT_REPORT_URL}\",
+                \"text\": \"Job Status: ${STATUS}\\nBranch: ${{ github.ref_name }}\\nCommit: ${{ github.sha }}\\nTriggered By: ${{ github.actor }}\\nTest Environment: ${TEST_ENVIRONMENT_URL}\",
+                \"color\": \"${COLOR}\"
               }
             ]
           }" $SLACK_WEBHOOK_URL
