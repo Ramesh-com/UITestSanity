@@ -1,45 +1,32 @@
-const { test, expect} = require('@playwright/test');
-const LoginPage = require('../pages/LoginPage');
-const HomePage = require('../pages/HomePage');
-const { authorize, getSignInLink } = require('../utils/googleAuth');
-const { launchBrowser } = require('../utils/browserSingleton');
+import { test, expect, chromium } from '@playwright/test';
+import { getSignInLink, authorize } from '../utils/googleAuth';
+import * as dotenv from 'dotenv';
+import { timeout } from '../playwright.config';
 
-
-require('dotenv').config();
-let page;
-let homePage;
-test.describe.configure({ mode: 'serial' });
-
-// test.beforeAll("Lauch the empty Browser", async()=>{
-//     await launchBrowser()
-// })
-async function performLogin() {
-    page = await launchBrowser();
-    const currentSize = page.viewportSize();
-    await page.setViewportSize({ width: currentSize.width, height: currentSize.height });
-
-    const APP_URL = "https://app.composio.dev";
-    
-    await page.goto(APP_URL);
-    const loginPage = new LoginPage(page);
-    await loginPage.enterUserMailAddress(process.env.USER_EMAIL);
-    await loginPage.clickSendLogInLinkButton();
-    
-    await page.waitForLoadState('load');
-    await page.waitForTimeout(5000);
+dotenv.config();
+test.describe.serial('Login Test Suite', () => {
+    let browser;
+    let context;
+    let page;
+  test('should login successfully', async ()=> {
+    browser = await chromium.launch({ headless: false });
+    context = await browser.newContext(); 
+    page = await context.newPage();
+    await page.goto("https://app.composio.dev");
+    await page.fill('input[type="email"]', process.env.USER_EMAIL);
+    await page.click("//button[.='Continue with email']"); 
     const client = await authorize();
     const signInLink = await getSignInLink(client);
     await page.goto(signInLink);
-    
-    return page;
-}
+    await page.waitForLoadState("networkidle");
+    expect(page.url()).toBe('https://app.composio.dev/dashboard'); 
+  });
 
-test.beforeAll("Application-successfull-login-test", async () => {
-    page = await performLogin();
-    homePage = new HomePage(page);
-})
-
-test('login-test', async()=>{
-    console.log('login was successful...');
-    
-})
+  test('create github integration', async ()=>{
+    await page.click('a[href="/apps"]');
+    await page.fill('input[placeholder="Search apps"]', 'github');
+    await page.click('a[href="/app/github"]');
+    await page.click('//div[text()="Category"]/../following-sibling::div');
+    await page.click('button:has-text("Create Integration")');
+  })
+});

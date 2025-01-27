@@ -35,7 +35,7 @@ module.exports = defineConfig({
     //   height: 1080
     // },
     /* Base URL to use in actions like `await page.goto('/')`. */
-    // baseURL: 'http://127.0.0.1:3000',
+    BASE_URL: 'https://app.composio.dev',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     navigationTimeout: 300000,
