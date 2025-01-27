@@ -9,7 +9,7 @@ test.describe.serial('Login Test Suite', () => {
     let context;
     let page;
   test('should login successfully', async ()=> {
-    browser = await chromium.launch({ headless: process.env.IS_HEADLESS === 'true' || false });
+    browser = await chromium.launch({ headless: true });
     context = await browser.newContext(); 
     page = await context.newPage();
     await page.goto("https://app.composio.dev");
