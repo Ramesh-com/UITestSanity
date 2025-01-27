@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 import { timeout } from '../playwright.config';
 
 dotenv.config();
-test.describe('Login Test Suite', () => {
+test.describe.serial('Login Test Suite', () => {
     let browser;
     let context;
     let page;
@@ -26,7 +26,7 @@ test.describe('Login Test Suite', () => {
     await page.click('a[href="/apps"]');
     await page.fill('input[placeholder="Search apps"]', 'github');
     await page.click('a[href="/app/github"]');
-    await page.click('div.font-[600].text-[white]:has-text("Setup Github integration")');
+    await page.click('//div[text()="Category"]/../following-sibling::div');
     await page.click('button:has-text("Create Integration")');
   })
 });
