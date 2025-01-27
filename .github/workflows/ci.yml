@@ -82,7 +82,7 @@ jobs:
 
       - name: Generate Playwright Report URL
         if: always()
-        run: echo "PLAYWRIGHT_REPORT_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
+        run: echo "PLAYWRIGHT_REPORT_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" >> $GITHUB_ENV
   
       - name: Notify Slack
         if: always() # Ensures notification is sent regardless of success or failure
