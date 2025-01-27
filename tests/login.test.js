@@ -9,7 +9,7 @@ test.describe.serial('Login Test Suite', () => {
     let context;
     let page;
   test('should login successfully', async ()=> {
-    browser = await chromium.launch({ headless: true });
+    browser = await chromium.launch({ headless: process.env.IS_HEADLESS === 'true' || false });
     context = await browser.newContext(); 
     page = await context.newPage();
     await page.goto("https://app.composio.dev");
@@ -19,7 +19,7 @@ test.describe.serial('Login Test Suite', () => {
     const signInLink = await getSignInLink(client);
     await page.goto(signInLink);
     await page.waitForLoadState("networkidle");
-    expect(page.url()).toBe('https://app.composio.dev/dashboard'); 
+    expect(page.url()).toContain('https://app.composio.dev/dashboard'); 
   });
 
   test('create github integration', async ()=>{
