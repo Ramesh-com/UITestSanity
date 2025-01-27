@@ -132,7 +132,7 @@ async function getSignInLink(oAuth2Client) {
     const res = await gmail.users.messages.list({
       userId: 'me',
       maxResults: 1,
-      labelIds: [label], 
+      labelIds: [label],
     });
 
     if (res.data.messages && res.data.messages.length > 0) {
@@ -146,7 +146,7 @@ async function getSignInLink(oAuth2Client) {
 
       if (email.data.payload.parts) {
         const part = email.data.payload.parts.find(
-          part => part.mimeType === 'text/html' || part.mimeType === 'text/plain'
+          (part) => part.mimeType === 'text/html' || part.mimeType === 'text/plain'
         );
         emailData = Buffer.from(part.body.data, 'base64').toString('utf-8');
       } else {
@@ -157,21 +157,49 @@ async function getSignInLink(oAuth2Client) {
       const match = emailData.match(linkRegex);
 
       if (match) {
-        console.log(match[0]);
+        console.log('Found sign-in link:', match[0]);
         return match[0];
       }
     }
     return null;
   }
 
-  // First, check the inbox
-  let signInLink = await searchEmailInLabel('INBOX');
+  // Polling mechanism to wait for the email
+  return new Promise((resolve, reject) => {
+    const maxAttempts = 10; // Maximum number of attempts
+    const interval = 2500; // Time between attempts (in milliseconds)
+    let attempts = 0;
 
-  // If not found in the inbox, check the spam/junk folder
-  if (!signInLink) {
-    signInLink = await searchEmailInLabel('SPAM');
-  }
-  return signInLink;
+    const intervalId = setInterval(async () => {
+      attempts++;
+
+      console.log(`Attempt ${attempts}: Checking for email...`);
+
+      try {
+        // Try searching in "INBOX" first
+        let signInLink = await searchEmailInLabel('INBOX');
+
+        // If not found in INBOX, try searching in "SPAM"
+        if (!signInLink) {
+          signInLink = await searchEmailInLabel('SPAM');
+        }
+
+        // If the link is found, resolve the promise and clear the interval
+        if (signInLink) {
+          clearInterval(intervalId);
+          resolve(signInLink);
+        }
+
+        // Stop polling after max attempts
+        if (attempts >= maxAttempts) {
+          clearInterval(intervalId);
+          reject(new Error('Failed to find sign-in link within the given attempts.'));
+        }
+      } catch (error) {
+        clearInterval(intervalId);
+        reject(error);
+      }
+    }, interval);
+  });
 }
-
 module.exports = { authorize, getSignInLink };
