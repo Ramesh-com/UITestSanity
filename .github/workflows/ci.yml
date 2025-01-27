@@ -105,6 +105,5 @@ jobs:
                 \"title_link\": \"${PLAYWRIGHT_REPORT_URL}\",
                 \"text\": \"Job Status: ${STATUS}\\nBranch: ${{ github.ref_name }}\\nCommit: ${{ github.sha }}\\nTriggered By: ${{ github.actor }}\\nTest Environment: ${TEST_ENVIRONMENT_URL}\",
                 \"color\": \"${COLOR}\"
-              }
             ]
           }" $SLACK_WEBHOOK_URL
