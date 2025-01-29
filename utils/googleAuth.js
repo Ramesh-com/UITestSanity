@@ -153,7 +153,7 @@ async function getSignInLink(oAuth2Client) {
         emailData = Buffer.from(email.data.payload.body.data, 'base64').toString('utf-8');
       }
 
-      const linkRegex = /https:\/\/app\.composio\.dev\/verify\?token=[\w-]+/;
+      const linkRegex = /https:\/\/.*\.?composio\.dev\/verify\?token=[\w-]+/;
       const match = emailData.match(linkRegex);
 
       if (match) {

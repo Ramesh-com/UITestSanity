@@ -115,6 +115,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           PLAYWRIGHT_REPORT_URL: ${{ env.PLAYWRIGHT_REPORT_URL }}
           TEST_ENVIRONMENT_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          CURRENT_TIME: $(date +"%I:%M %p")
         run: |
           STATUS="Success"
           COLOR="good"
@@ -122,11 +123,23 @@ jobs:
             STATUS="Failure"
             COLOR="danger"
           fi
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            echo "cron_run=true" >> $GITHUB_ENV
+          else
+            echo "cron_run=false" >> $GITHUB_ENV
+          fi
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "manual_test=true" >> $GITHUB_ENV
+          else
+            echo "manual_test=false" >> $GITHUB_ENV
+          fi
+
           curl -X POST -H 'Content-type: application/json' --data "{
             \"text\": \"CI/CD Pipeline ${STATUS}\",
             \"attachments\": [
               {
-                \"text\": \"Playwright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: ${{ github.ref_name }}\\nCommit: ${{ github.sha }}\\nTriggered By: ${{ github.actor }}\\nTest Environment: ${TEST_ENVIRONMENT_URL}\",
+                \"text\": \"{% if cron_run == 'true' %}Ran Automated Cron monitoring on Prod at ${CURRENT_TIME}{% endif %}\\n{% if test_checks == 'true' %}Ran Test checks on baseURL{% endif %}\\n{% if manual_test == 'true' %}Ran Manual Test on Env app.composio.dev on Prod at ${CURRENT_TIME}{% endif %}\\nPlaywright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: ${{ github.ref_name }}\\nCommit: ${{ github.sha }}\\nTriggered By: ${{ github.actor }}\\nTest Environment: ${TEST_ENVIRONMENT_URL}\",
                 \"color\": \"${COLOR}\"
               }
             ]

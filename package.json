@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "npx playwright test",
-    "report": "npx playwright show-report"
+    "test:staging": "BASE_URL=https://staging-app.composio.dev npx playwright test",
+    "test:prod": "BASE_URL=https://app.composio.dev npx playwright test",
+    "test:local": "BASE_URL=http://localhost:3000 npx playwright test"
   },
   "keywords": [],
   "author": "",
