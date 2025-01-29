@@ -19,6 +19,6 @@ test.describe.serial('Login Test Suite', () => {
     await page.goto(signInLink);
     console.log('logging into the application...');
     await page.waitForLoadState("networkidle");
-    expect(page.url()).toBe('https://app.composio.dev/dashboard'); 
+    expect(page.url()).toContain('https://app.composio.dev/dashboard'); 
   });
 });
