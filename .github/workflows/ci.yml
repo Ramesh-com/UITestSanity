@@ -101,8 +101,7 @@ jobs:
       - name: Print HTML report folder unique URL
         if: ${{ failure() || success() }}
         run: |
-          echo "PLAYWRIGHT_TEST_REPORT_URL: 'https://pub-92e668239ab84bfd80ee07d61e9d2f40.r2.dev/coverage-${{ github.run_id }}/coverage/index.html'" >> $GITHUB_ENV
-
+          echo "PLAYWRIGHT_TEST_REPORT_URL=https://pub-92e668239ab84bfd80ee07d61e9d2f40.r2.dev/coverage-13026481468/coverage/index.html" >> $GITHUB_ENV
       - name: Find Comment
         if: ${{ failure() || success() }}
         uses: peter-evans/find-comment@v3
