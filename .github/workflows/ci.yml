@@ -116,6 +116,10 @@ jobs:
           PLAYWRIGHT_REPORT_URL: ${{ env.PLAYWRIGHT_REPORT_URL }}
           TEST_ENVIRONMENT_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           CURRENT_TIME: $(date +"%I:%M %p")
+          COMMIT_HASH: ${{ github.sha }}
+          BRANCH: ${{ github.ref_name }}
+          TRIGGERED_BY: ${{ github.actor }}
+
         run: |
           STATUS="Success"
           COLOR="good"
@@ -159,7 +163,7 @@ jobs:
             \"text\": \"CI/CD Pipeline ${STATUS}\",
             \"attachments\": [
               {
-                \"text\": \"${CRON_MESSAGE}\\n${TEST_CHECKS_MESSAGE}\\n${MANUAL_MESSAGE}\\nPlaywright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: main\\nCommit: 8445a8008585f266b55a2d343b94cdbba1a6e9f7\\nTriggered By: Ramesh-com\\nTest Environment: ${TEST_ENVIRONMENT_URL}\",
+                \"text\": \"${CRON_MESSAGE}\\n${TEST_CHECKS_MESSAGE}\\n${MANUAL_MESSAGE}\\nPlaywright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: ${BRANCH}\\nCommit: ${COMMIT_HASH}\\nTriggered By: ${TRIGGERED_BY}\\nTest Run Time: ${CURRENT_TIME}\",
                 \"color\": \"${COLOR}\"
               }
             ]
