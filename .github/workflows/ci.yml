@@ -115,38 +115,55 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           PLAYWRIGHT_REPORT_URL: ${{ env.PLAYWRIGHT_REPORT_URL }}
           TEST_ENVIRONMENT_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          CURRENT_TIME: $(date +"%I:%M %p")
         run: |
           STATUS="Success"
           COLOR="good"
 
+          # Check job status
           if [[ "${{ job.status }}" == "failure" ]]; then
             STATUS="Failure"
             COLOR="danger"
           fi
 
+          # Determine if it's a cron job
           if [[ "${{ github.event_name }}" == "schedule" ]]; then
             echo "cron_run=true" >> $GITHUB_ENV
           else
             echo "cron_run=false" >> $GITHUB_ENV
           fi
 
+          # Determine if it's a manual test trigger
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "manual_test=true" >> $GITHUB_ENV
           else
             echo "manual_test=false" >> $GITHUB_ENV
           fi
-          
-          CURRENT_TIME=$(date +"%I:%M %p")
-          SLACK_MESSAGE="{\"text\": \"CI/CD Pipeline ${STATUS}\", 
+
+          # Initialize the message parts
+          CRON_MESSAGE=""
+          MANUAL_MESSAGE=""
+          TEST_CHECKS_MESSAGE="Ran Test checks on baseURL"
+
+          # Apply conditions based on environment variables
+          if [[ "${{ env.cron_run }}" == "true" ]]; then
+            CRON_MESSAGE="Ran Automated Cron monitoring on Prod at ${CURRENT_TIME}"
+          fi
+
+          if [[ "${{ env.manual_test }}" == "true" ]]; then
+            MANUAL_MESSAGE="Ran Manual Test on Env app.composio.dev on Prod at ${CURRENT_TIME}"
+          fi
+
+          # Construct the Slack message with the dynamic content
+          SLACK_MESSAGE="{
+            \"text\": \"CI/CD Pipeline ${STATUS}\",
             \"attachments\": [
               {
-                \"text\": \"$(if [[ \"$cron_run\" == \"true\" ]]; then echo \"Ran Automated Cron monitoring on Prod at ${CURRENT_TIME}\"; fi)
-                $(if [[ \"$test_checks\" == \"true\" ]]; then echo \"Ran Test checks on baseURL\"; fi)
-                $(if [[ \"$manual_test\" == \"true\" ]]; then echo \"Ran Manual Test on Env app.composio.dev on Prod at ${CURRENT_TIME}\"; fi)
-                \\nPlaywright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: main\\nCommit: 8445a8008585f266b55a2d343b94cdbba1a6e9f7\\nTriggered By: Ramesh-com\\nTest Environment: ${TEST_ENVIRONMENT_URL}\",
+                \"text\": \"${CRON_MESSAGE}\\n${TEST_CHECKS_MESSAGE}\\n${MANUAL_MESSAGE}\\nPlaywright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: main\\nCommit: 8445a8008585f266b55a2d343b94cdbba1a6e9f7\\nTriggered By: Ramesh-com\\nTest Environment: ${TEST_ENVIRONMENT_URL}\",
                 \"color\": \"${COLOR}\"
               }
             ]
           }"
 
+          # Send the message via Slack webhook
           curl -X POST -H 'Content-type: application/json' --data "${SLACK_MESSAGE}" $SLACK_WEBHOOK_URL
