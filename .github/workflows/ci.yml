@@ -2,7 +2,7 @@ name: Regression Test Status
 
 on:
   schedule:
-    - cron: "0 */3 * * *"
+    - cron: "*/30 * * * *"
   push:
   workflow_dispatch:
 
