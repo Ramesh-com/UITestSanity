@@ -185,7 +185,7 @@ jobs:
                 attachments: [
                   {
                     text: "*Test Type*: \($cron_message)\n\($manual_message)\n*Job Status*: \($job_status)\n*Branch*: \($branch)\n*Commit Hash*: \($commit_hash)\n*Triggered By*: \($triggered_by)\n*Test Run Time*: \($current_time)\n*Playwright Test Report URL*: \($playwright_report_url)",
-                    color: \($color)
+                    color: "\($color)"
                   }
                 ]
             }')
