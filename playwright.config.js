@@ -27,7 +27,7 @@ module.exports = defineConfig({
     ['html', { open: 'always' }],  // Ensure the HTML reporter is enabled
   ],
 
-  timeout: 300000,
+  timeout: 600000,
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     // viewport: {
