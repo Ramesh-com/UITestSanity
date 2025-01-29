@@ -21,17 +21,9 @@ git clone https://github.com/ramesh-com/uitestsanity.git
 Create a `.env` file in the root directory with the following content:
  - USER_EMAIL= <your_email_id>
  - HEADLESS= <'true / false '>  # 'true' for headless and 'false' for headed mode
- - BASE_URL= <production-url>
-
-Create a `.env.staging` file in the root directory with the following content:
- - USER_EMAIL= <your_email_id>
- - HEADLESS= <'true / false '>  # 'true' for headless and 'false' for headed mode
- - BASE_URL= <staging-url>
-
-Create a `.env.local` file in the root directory with the following content:
- - USER_EMAIL= <your_email_id>
- - HEADLESS= <'true / false '>  # 'true' for headless and 'false' for headed mode
- - BASE_URL= <local-url>
+ - PROD_URL= <production-url>
+ - STAGING_URL= <staging-url>
+ - LOCAL_URL= <local-url>
 
 ### 4. Set Up Gmail OAuth
 

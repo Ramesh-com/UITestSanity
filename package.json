@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test:staging": "dotenv -e .env.staging -- npx playwright test",
-    "test:prod": "dotenv -e .env -- npx playwright test",
-    "test:local": "dotenv -e .env.local -- npx playwright test"
+    "test:staging": "dotenv BASE_URL=$STAGING_URL npx playwright test",
+    "test:prod": "dotenv BASE_URL=$PROD_URL npx playwright test",
+    "test:local": "dotenv BASE_URL=$LOCAL_URL npx playwright test"
   },
   "keywords": [],
   "author": "",
