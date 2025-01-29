@@ -115,14 +115,15 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           PLAYWRIGHT_REPORT_URL: ${{ env.PLAYWRIGHT_REPORT_URL }}
           TEST_ENVIRONMENT_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          CURRENT_TIME: $(date +"%I:%M %p")
         run: |
           STATUS="Success"
           COLOR="good"
+
           if [[ "${{ job.status }}" == "failure" ]]; then
             STATUS="Failure"
             COLOR="danger"
           fi
+
           if [[ "${{ github.event_name }}" == "schedule" ]]; then
             echo "cron_run=true" >> $GITHUB_ENV
           else
@@ -134,13 +135,18 @@ jobs:
           else
             echo "manual_test=false" >> $GITHUB_ENV
           fi
-
-          curl -X POST -H 'Content-type: application/json' --data "{
-            \"text\": \"CI/CD Pipeline ${STATUS}\",
+          
+          CURRENT_TIME=$(date +"%I:%M %p")
+          SLACK_MESSAGE="{\"text\": \"CI/CD Pipeline ${STATUS}\", 
             \"attachments\": [
               {
-                \"text\": \"{% if cron_run == 'true' %}Ran Automated Cron monitoring on Prod at ${CURRENT_TIME}{% endif %}\\n{% if test_checks == 'true' %}Ran Test checks on baseURL{% endif %}\\n{% if manual_test == 'true' %}Ran Manual Test on Env app.composio.dev on Prod at ${CURRENT_TIME}{% endif %}\\nPlaywright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: ${{ github.ref_name }}\\nCommit: ${{ github.sha }}\\nTriggered By: ${{ github.actor }}\\nTest Environment: ${TEST_ENVIRONMENT_URL}\",
+                \"text\": \"$(if [[ \"$cron_run\" == \"true\" ]]; then echo \"Ran Automated Cron monitoring on Prod at ${CURRENT_TIME}\"; fi)
+                $(if [[ \"$test_checks\" == \"true\" ]]; then echo \"Ran Test checks on baseURL\"; fi)
+                $(if [[ \"$manual_test\" == \"true\" ]]; then echo \"Ran Manual Test on Env app.composio.dev on Prod at ${CURRENT_TIME}\"; fi)
+                \\nPlaywright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: main\\nCommit: 8445a8008585f266b55a2d343b94cdbba1a6e9f7\\nTriggered By: Ramesh-com\\nTest Environment: ${TEST_ENVIRONMENT_URL}\",
                 \"color\": \"${COLOR}\"
               }
             ]
-          }" $SLACK_WEBHOOK_URL
+          }"
+
+          curl -X POST -H 'Content-type: application/json' --data "${SLACK_MESSAGE}" $SLACK_WEBHOOK_URL
