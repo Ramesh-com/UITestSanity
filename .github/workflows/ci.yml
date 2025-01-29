@@ -164,7 +164,7 @@ jobs:
               \"text\": \"CI/CD Pipeline ${STATUS}\",
               \"attachments\": [
                 {
-                  \"text\": \"${CRON_MESSAGE}\\n${MANUAL_MESSAGE}\\nPlaywright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: ${BRANCH}\\nCommit: ${COMMIT_HASH}\\nTriggered By: ${TRIGGERED_BY}\\nTest Run Time: ${CURRENT_TIME}\",
+                  \"text\": \"${CRON_MESSAGE}\\n${MANUAL_MESSAGE}\\nPlaywright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: ${BRANCH}\\nCommit: ${COMMIT_HASH}\\nTriggered By: $([[ \"${{ env.cron_run }}\" == \"true\" ]] && echo \"cron\" || echo \"${TRIGGERED_BY}\")\\nTest Run Time: ${CURRENT_TIME}\",
                   \"color\": \"${COLOR}\"
                 }
               ]
