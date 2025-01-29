@@ -58,11 +58,28 @@ jobs:
       - name: Secure OAuth Credentials
         run: chmod 600 credentials.json token.json
 
+      - name: Set Environment Based on User Input (Manual Trigger)
+        id: set-env
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            # Prompt the user for input when the workflow is triggered manually
+            echo "Please select the environment to run tests on (prod, staging, or local):"
+            read USER_ENV
+            echo "USER_ENV=${USER_ENV}" >> $GITHUB_ENV
+          else
+            # Default to 'prod' if triggered by cron or automation
+            echo "USER_ENV=prod" >> $GITHUB_ENV
+          fi
+
+      # Step to run Playwright tests based on the selected environment
       - name: Run Playwright Tests
         env:
-          USER_EMAIL: ${{vars.USER_EMAIL}}
+          USER_EMAIL: ${{ vars.USER_EMAIL }}
           HEADLESS: 'true'
-        run: npx playwright test --project chromium
+          ENVIRONMENT: ${{ env.USER_ENV }}  # Use the selected environment
+        run: |
+          echo "Running Playwright tests on environment: $ENVIRONMENT"
+          npx playwright test:$ENVIRONMENT
 
       - name: Upload Playwright Test Results
         if: always()
@@ -167,7 +184,7 @@ jobs:
               MANUAL_MESSAGE="Ran Manual Test on Prod at ${CURRENT_TIME}"
               TEST_TYPE="${MANUAL_MESSAGE}"
             else
-              USER_MESSAGE="Triggered by ${TRIGGERED_BY} at ${CURRENT_TIME}"
+              USER_MESSAGE="Triggered by ${TRIGGERED_BY}"
               TEST_TYPE="${USER_MESSAGE}"
             fi
   
