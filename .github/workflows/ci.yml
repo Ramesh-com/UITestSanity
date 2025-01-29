@@ -79,7 +79,7 @@ jobs:
           ENVIRONMENT: ${{ env.USER_ENV }}  # Use the selected environment
         run: |
           echo "Running Playwright tests on environment: $ENVIRONMENT"
-          npx playwright test:$ENVIRONMENT
+          npm run test:$ENVIRONMENT
 
       - name: Upload Playwright Test Results
         if: always()
