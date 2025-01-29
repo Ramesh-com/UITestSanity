@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test:staging": "dotenv BASE_URL=$STAGING_URL npx playwright test",
-    "test:prod": "dotenv BASE_URL=$PROD_URL npx playwright test",
-    "test:local": "dotenv BASE_URL=$LOCAL_URL npx playwright test"
+    "test:staging": "cross-env BASE_URL=$STAGING_URL npx playwright test",
+    "test:prod": "cross-env BASE_URL=$PROD_URL npx playwright test",
+    "test:local": "cross-env BASE_URL=$LOCAL_URL npx playwright test"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +13,8 @@
   "description": "",
   "devDependencies": {
     "@playwright/test": "^1.46.1",
-    "@types/node": "^22.5.1"
+    "@types/node": "^22.5.1",
+    "cross-env": "^7.0.3"
   },
   "dependencies": {
     "@google-cloud/local-auth": "^2.1.0",
