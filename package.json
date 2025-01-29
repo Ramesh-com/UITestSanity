@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test:staging": "BASE_URL=https://staging-app.composio.dev npx playwright test",
-    "test:prod": "BASE_URL=https://app.composio.dev npx playwright test",
-    "test:local": "BASE_URL=http://localhost:3000 npx playwright test"
+    "test:staging": "dotenv -e .env.staging -- npx playwright test",
+    "test:prod": "dotenv -e .env -- npx playwright test",
+    "test:local": "dotenv -e .env.local -- npx playwright test"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +19,7 @@
     "@google-cloud/local-auth": "^2.1.0",
     "composio-core": "^0.5.3",
     "dotenv": "^16.4.5",
+    "dotenv-cli": "^8.0.0",
     "googleapis": "^105.0.0",
     "mailosaur": "^8.8.0",
     "otplib": "^12.0.1"

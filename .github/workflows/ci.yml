@@ -92,7 +92,7 @@ jobs:
       - name: Print unique URL
         if: ${{ failure() || success() }}
         run: |
-          echo "URL: 'https://pub-92e668239ab84bfd80ee07d61e9d2f40.r2.dev/coverage-${{ github.run_id }}/coverage/index.html'"
+          echo "PLAYWRIGHT_REPORT_URL: 'https://pub-92e668239ab84bfd80ee07d61e9d2f40.r2.dev/coverage-${{ github.run_id }}/coverage/index.html'"
 
       - name: Print HTML report folder unique URL
         if: ${{ failure() || success() }}
@@ -111,14 +111,13 @@ jobs:
 
       - name: Set current time
         id: current_time
-        run: echo "CURRENT_TIME=$(date +"%I:%M %p")" >> $GITHUB_ENV
-  
+        run: echo "CURRENT_TIME=$(date +"%d-%b-%y %H:%M:%S")" >> $GITHUB_ENV
+
       - name: Notify Slack
         if: always()
         env:
             SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
             PLAYWRIGHT_REPORT_URL: ${{ env.PLAYWRIGHT_REPORT_URL }}
-            TEST_ENVIRONMENT_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             CURRENT_TIME: ${{ env.CURRENT_TIME }}
             COMMIT_HASH: ${{ github.sha }}
             BRANCH: ${{ github.ref_name }}
@@ -150,8 +149,7 @@ jobs:
             # Initialize the message parts
             CRON_MESSAGE=""
             MANUAL_MESSAGE=""
-            TEST_CHECKS_MESSAGE="Ran Test checks on baseURL"
-  
+              
             # Apply conditions based on environment variables
             if [[ "${{ env.cron_run }}" == "true" ]]; then
               CRON_MESSAGE="Ran Automated Cron monitoring on Prod at ${CURRENT_TIME}"
@@ -166,7 +164,7 @@ jobs:
               \"text\": \"CI/CD Pipeline ${STATUS}\",
               \"attachments\": [
                 {
-                  \"text\": \"${CRON_MESSAGE}\\n${TEST_CHECKS_MESSAGE}\\n${MANUAL_MESSAGE}\\nPlaywright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: ${BRANCH}\\nCommit: ${COMMIT_HASH}\\nTriggered By: ${TRIGGERED_BY}\\nTest Run Time: ${CURRENT_TIME}\",
+                  \"text\": \"${CRON_MESSAGE}\\n${MANUAL_MESSAGE}\\nPlaywright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: ${BRANCH}\\nCommit: ${COMMIT_HASH}\\nTriggered By: ${TRIGGERED_BY}\\nTest Run Time: ${CURRENT_TIME}\",
                   \"color\": \"${COLOR}\"
                 }
               ]
