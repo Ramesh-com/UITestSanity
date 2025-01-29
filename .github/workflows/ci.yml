@@ -5,6 +5,16 @@ on:
     - cron: "*/30 * * * *"
   push:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Which environment to run the tests on (prod, staging, local)'
+        required: true
+        default: 'prod'
+        type: choice
+        options:
+          - prod
+          - staging
+          - local
 
 jobs:
   test:
@@ -62,21 +72,16 @@ jobs:
         id: set-env
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            # Prompt the user for input when the workflow is triggered manually
-            echo "Please select the environment to run tests on (prod, staging, or local):"
-            read USER_ENV
-            echo "USER_ENV=${USER_ENV}" >> $GITHUB_ENV
+            echo "USER_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
           else
-            # Default to 'prod' if triggered by cron or automation
             echo "USER_ENV=prod" >> $GITHUB_ENV
           fi
 
-      # Step to run Playwright tests based on the selected environment
       - name: Run Playwright Tests
         env:
           USER_EMAIL: ${{ vars.USER_EMAIL }}
           HEADLESS: 'true'
-          ENVIRONMENT: ${{ env.USER_ENV }}  # Use the selected environment
+          ENVIRONMENT: ${{ env.USER_ENV }}  
         run: |
           echo "Running Playwright tests on environment: $ENVIRONMENT"
           npm run test:$ENVIRONMENT
@@ -172,25 +177,17 @@ jobs:
               echo "manual_test=false" >> $GITHUB_ENV
             fi
   
-            # Initialize the message parts
-            CRON_MESSAGE=""
-            MANUAL_MESSAGE=""
-              
-            # Apply conditions based on environment variables
+            # Construct the message dynamically based on job status and other variables
+            TEST_TYPE=""
             if [[ "${{ env.cron_run }}" == "true" ]]; then
-              CRON_MESSAGE="Ran Automated Cron monitoring on Prod at ${CURRENT_TIME}"
-              TEST_TYPE="${CRON_MESSAGE}"
+              TEST_TYPE="Ran Automated Cron monitoring on Prod at ${CURRENT_TIME}"
             elif [[ "${{ env.manual_test }}" == "true" ]]; then
-              MANUAL_MESSAGE="Ran Manual Test on Prod at ${CURRENT_TIME}"
-              TEST_TYPE="${MANUAL_MESSAGE}"
+              TEST_TYPE="Ran Manual Test on ${ENVIRONMENT} at ${CURRENT_TIME}"
             else
-              USER_MESSAGE="Triggered by ${TRIGGERED_BY}"
-              TEST_TYPE="${USER_MESSAGE}"
+              TEST_TYPE="Triggered by ${TRIGGERED_BY}"
             fi
   
-            # Construct the Slack message with the dynamic content
             SLACK_MESSAGE=$(jq -n \
-              --arg status "$STATUS" \
               --arg test_type "$TEST_TYPE" \
               --arg job_status "$STATUS" \
               --arg branch "$BRANCH" \
@@ -200,7 +197,7 @@ jobs:
               --arg playwright_report_url "$PLAYWRIGHT_REPORT_URL" \
               --arg color "$COLOR" \
             '{
-                text: "*Regression Testing: \($status)*",
+                text: "*Regression Testing: \($job_status)*",
                 attachments: [
                   {
                     text: "*Test Type*: \($test_type)\n*Job Status*: \($job_status)\n*Branch*: \($branch)\n*Commit Hash*: \($commit_hash)\n*Triggered By*: \($triggered_by)\n*Test Run Time*: \($current_time)\n*Playwright Test Report URL*: \($playwright_report_url)",
@@ -209,5 +206,4 @@ jobs:
                 ]
             }')
   
-            # Send the message via Slack webhook
             curl -X POST -H 'Content-type: application/json' --data "${SLACK_MESSAGE}" $SLACK_WEBHOOK_URL
