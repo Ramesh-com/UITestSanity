@@ -98,7 +98,7 @@ jobs:
         if: ${{ failure() || success() }}
         run: |
           echo "PLAYWRIGHT_REPORT_URL=https://pub-92e668239ab84bfd80ee07d61e9d2f40.r2.dev/coverage-${{ github.run_id }}/coverage/index.html" >> $GITHUB_ENV
-          
+
       - name: Find Comment
         if: ${{ failure() || success() }}
         uses: peter-evans/find-comment@v3
@@ -126,9 +126,7 @@ jobs:
             \"text\": \"CI/CD Pipeline ${STATUS}\",
             \"attachments\": [
               {
-                \"title\": \"Playwright Test Report\",
-                \"title_link\": \"${PLAYWRIGHT_REPORT_URL}\",
-                \"text\": \"Job Status: ${STATUS}\\nBranch: ${{ github.ref_name }}\\nCommit: ${{ github.sha }}\\nTriggered By: ${{ github.actor }}\\nTest Environment: ${TEST_ENVIRONMENT_URL}\",
+                \"text\": \"Playwright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: ${{ github.ref_name }}\\nCommit: ${{ github.sha }}\\nTriggered By: ${{ github.actor }}\\nTest Environment: ${TEST_ENVIRONMENT_URL}\",
                 \"color\": \"${COLOR}\"
               }
             ]
