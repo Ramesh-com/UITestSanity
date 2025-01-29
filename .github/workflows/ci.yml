@@ -162,18 +162,19 @@ jobs:
             # Apply conditions based on environment variables
             if [[ "${{ env.cron_run }}" == "true" ]]; then
               CRON_MESSAGE="Ran Automated Cron monitoring on Prod at ${CURRENT_TIME}"
+              TEST_TYPE="${CRON_MESSAGE}"
             elif [[ "${{ env.manual_test }}" == "true" ]]; then
               MANUAL_MESSAGE="Ran Manual Test on Prod at ${CURRENT_TIME}"
+              TEST_TYPE="${MANUAL_MESSAGE}"
             else
-              USER_MESSAGE="Triggered by the ${TRIGGERED_BY} at ${CURRENT_TIME}"
+              USER_MESSAGE="Triggered by ${TRIGGERED_BY} at ${CURRENT_TIME}"
+              TEST_TYPE="${USER_MESSAGE}"
             fi
   
             # Construct the Slack message with the dynamic content
             SLACK_MESSAGE=$(jq -n \
               --arg status "$STATUS" \
-              --arg cron_message "$CRON_MESSAGE" \
-              --arg manual_message "$MANUAL_MESSAGE" \
-              --arg user_message "$USER_MESSAGE" \
+              --arg test_type "$TEST_TYPE" \
               --arg job_status "$STATUS" \
               --arg branch "$BRANCH" \
               --arg commit_hash "$COMMIT_HASH" \
@@ -185,7 +186,7 @@ jobs:
                 text: "*Regression Testing: \($status)*",
                 attachments: [
                   {
-                    text: "*Test Type*: \($cron_message)\n\($manual_message)\n($user_message)\n*Job Status*: \($job_status)\n*Branch*: \($branch)\n*Commit Hash*: \($commit_hash)\n*Triggered By*: \($triggered_by)\n*Test Run Time*: \($current_time)\n*Playwright Test Report URL*: \($playwright_report_url)",
+                    text: "*Test Type*: \($test_type)\n*Job Status*: \($job_status)\n*Branch*: \($branch)\n*Commit Hash*: \($commit_hash)\n*Triggered By*: \($triggered_by)\n*Test Run Time*: \($current_time)\n*Playwright Test Report URL*: \($playwright_report_url)",
                     color: "\($color)"
                   }
                 ]
