@@ -113,6 +113,15 @@ jobs:
         id: current_time
         run: echo "CURRENT_TIME=$(date +"%d-%b-%y %H:%M:%S")" >> $GITHUB_ENV
 
+      - name: Set Triggered By
+        id: triggered_by
+        run: |
+          if [[ "${{ env.cron_run }}" == "true" ]]; then
+            echo "TRIGGERED_BY=cron" >> $GITHUB_ENV
+          else
+            echo "TRIGGERED_BY=${{ github.actor }}" >> $GITHUB_ENV
+          fi
+
       - name: Notify Slack
         if: always()
         env:
@@ -121,7 +130,7 @@ jobs:
             CURRENT_TIME: ${{ env.CURRENT_TIME }}
             COMMIT_HASH: ${{ github.sha }}
             BRANCH: ${{ github.ref_name }}
-            TRIGGERED_BY: ${{ github.actor }}
+            TRIGGERED_BY: ${{ env.TRIGGERED_BY }}
         run: |
             STATUS="Success"
             COLOR="good"
@@ -164,7 +173,7 @@ jobs:
               \"text\": \"CI/CD Pipeline ${STATUS}\",
               \"attachments\": [
                 {
-                  \"text\": \"${CRON_MESSAGE}\\n${MANUAL_MESSAGE}\\nPlaywright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: ${BRANCH}\\nCommit: ${COMMIT_HASH}\\nTriggered By: $([[ \"${{ env.cron_run }}\" == \"true\" ]] && echo \"cron\" || echo \"${TRIGGERED_BY}\")\\nTest Run Time: ${CURRENT_TIME}\",
+                  \"text\": \"${CRON_MESSAGE}\\n${MANUAL_MESSAGE}\\nPlaywright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: ${BRANCH}\\nCommit: ${COMMIT_HASH}\\nTriggered By: ${TRIGGERED_BY}\\nTest Run Time: ${CURRENT_TIME}\",
                   \"color\": \"${COLOR}\"
                 }
               ]
