@@ -117,7 +117,7 @@ jobs:
         if: always()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          PLAYWRIGHT_REPORT_URL: ${{ env.PLAYWRIGHT_REPORT_URL }}
+          PLAYWRIGHT_REPORT_URL: ${{ env.PLAYWRIGHT_TEST_REPORT_URL }}
           TEST_ENVIRONMENT_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |
           STATUS="Success"
@@ -131,7 +131,7 @@ jobs:
             \"attachments\": [
               {
                 \"title\": \"Playwright Test Report\",
-                \"title_link\": \"${PLAYWRIGHT_TEST_REPORT_URL}\",
+                \"title_link\": \"${PLAYWRIGHT_REPORT_URL}\",
                 \"text\": \"Job Status: ${STATUS}\\nBranch: ${{ github.ref_name }}\\nCommit: ${{ github.sha }}\\nTriggered By: ${{ github.actor }}\\nTest Environment: ${TEST_ENVIRONMENT_URL}\",
                 \"color\": \"${COLOR}\"
             ]
