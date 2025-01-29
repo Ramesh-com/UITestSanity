@@ -19,9 +19,19 @@ git clone https://github.com/ramesh-com/uitestsanity.git
 ### 3. Configure Environment Variables
 
 Create a `.env` file in the root directory with the following content:
-
  - USER_EMAIL= <your_email_id>
  - HEADLESS= <'true / false '>  # 'true' for headless and 'false' for headed mode
+ - BASE_URL= <production-url>
+
+Create a `.env.staging` file in the root directory with the following content:
+ - USER_EMAIL= <your_email_id>
+ - HEADLESS= <'true / false '>  # 'true' for headless and 'false' for headed mode
+ - BASE_URL= <staging-url>
+
+Create a `.env.local` file in the root directory with the following content:
+ - USER_EMAIL= <your_email_id>
+ - HEADLESS= <'true / false '>  # 'true' for headless and 'false' for headed mode
+ - BASE_URL= <local-url>
 
 ### 4. Set Up Gmail OAuth
 
@@ -44,7 +54,9 @@ You need to configure Gmail OAuth to handle email verification.
 You can run the tests using the following command:
 
 - To run in chrome browser 
-    - npx playwright test  
+    - npm run test:prod #To run the test on Production-env
+    - npm run test:staging #To run tests on Staging-env
+    - npm run test:local  #To run tests on local-env  
 
 ### 6. View Test Results
 Test results are automatically generated in the `test-results/` folder. You can also view the HTML report using:

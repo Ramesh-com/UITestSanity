@@ -170,10 +170,10 @@ jobs:
   
             # Construct the Slack message with the dynamic content
             SLACK_MESSAGE="{
-              \"text\": \"CI/CD Pipeline ${STATUS}\",
+              \"text\": \"*Regression Testing: ${STATUS}*\",\n
               \"attachments\": [
                 {
-                  \"text\": \"${CRON_MESSAGE}\\n${MANUAL_MESSAGE}\\nPlaywright Test Report URL: ${PLAYWRIGHT_REPORT_URL}\\nJob Status: ${STATUS}\\nBranch: ${BRANCH}\\nCommit: ${COMMIT_HASH}\\nTriggered By: ${TRIGGERED_BY}\\nTest Run Time: ${CURRENT_TIME}\",
+                  \"text\": \"*Test Type*: ${CRON_MESSAGE}\\n${MANUAL_MESSAGE}\\n*Job Status*: ${STATUS}\\n*Branch*: ${BRANCH}\\n*Commit Hash*: ${COMMIT_HASH}\\n*Triggered By*: ${TRIGGERED_BY}\\n*Test Run Time*: ${CURRENT_TIME}\\n*Playwright Test Report URL*: ${PLAYWRIGHT_REPORT_URL}\",
                   \"color\": \"${COLOR}\"
                 }
               ]
