@@ -8,7 +8,7 @@ test.describe.serial('Regression test suite', () => {
     let context;
     let page;
   test('checking application login functionality', async ()=> {
-    browser = await chromium.launch({ headless: true });
+    browser = await chromium.launch({ headless: process.env.HEADLESS === 'true' || false });
     context = await browser.newContext(); 
     page = await context.newPage();
     await page.goto('/');
