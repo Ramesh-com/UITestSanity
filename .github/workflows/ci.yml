@@ -104,9 +104,9 @@ jobs:
         if: ${{ failure() || success() }}
         uses: himanshu-dixit/r2-upload-action-parallel@v1.3
         with:
-          r2-account-id: 4d4f16c61d89ec64e760039c4ec50717
-          r2-access-key-id: 0d667496881e1d6a0326454c7076cdab
-          r2-secret-access-key: 29bb51006a9ab7419d90797b7d551a0145f0e2d632dbc4c71b3210b31b59d959
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           r2-bucket: github-action
           source-dir: playwright-report
           destination-dir: coverage-${{ github.run_id }}/coverage
@@ -157,7 +157,7 @@ jobs:
             elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
               TEST_TYPE="Ran Manual Test on ${ENVIRONMENT} at ${CURRENT_TIME}"
             else
-              TEST_TYPE="Triggered by push on ${ENVIRONMENT}"
+              TEST_TYPE="Triggered by push-event on ${ENVIRONMENT} at ${CURRENT_TIME}"
             fi
             SLACK_MESSAGE=$(jq -n \
               --arg test_type "$TEST_TYPE" \
