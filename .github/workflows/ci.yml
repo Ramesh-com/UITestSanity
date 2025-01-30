@@ -144,7 +144,6 @@ jobs:
             COMMIT_HASH: ${{ github.sha }}
             BRANCH: ${{ github.ref_name }}
             ENVIRONMENT: ${{ env.ENVIRONMENT }}
-            TRIGGERED_BY: ${{ env.TRIGGERED_BY }}
         run: |
             STATUS="Success"
             COLOR="good"
@@ -158,7 +157,7 @@ jobs:
             elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
               TEST_TYPE="Ran Manual Test on ${ENVIRONMENT} at ${CURRENT_TIME}"
             else
-              TEST_TYPE="Triggered by ${TRIGGERED_BY} on ${ENVIRONMENT}"
+              TEST_TYPE="Triggered by push on ${ENVIRONMENT}"
             fi
             SLACK_MESSAGE=$(jq -n \
               --arg test_type "$TEST_TYPE" \
