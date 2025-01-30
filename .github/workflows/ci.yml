@@ -72,16 +72,16 @@ jobs:
         id: set-env
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "USER_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+            echo "ENVIRONMENT=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
           else
-            echo "USER_ENV=prod" >> $GITHUB_ENV
+            echo "ENVIRONMENT=prod" >> $GITHUB_ENV
           fi
 
       - name: Run Playwright Tests
         env:
           USER_EMAIL: ${{ vars.USER_EMAIL }}
           HEADLESS: 'true'
-          ENVIRONMENT: ${{ env.USER_ENV }}  
+          ENVIRONMENT: ${{ env.ENVIRONMENT }}
         run: |
           echo "Running Playwright tests on environment: $ENVIRONMENT"
           npm run test:$ENVIRONMENT
@@ -135,15 +135,6 @@ jobs:
         id: current_time
         run: echo "CURRENT_TIME=$(date +"%d-%b-%y %H:%M:%S")" >> $GITHUB_ENV
 
-      - name: Set Triggered By
-        id: triggered_by
-        run: |
-          if [[ "${{ env.cron_run }}" == "true" ]]; then
-            echo "TRIGGERED_BY=cron" >> $GITHUB_ENV
-          else
-            echo "TRIGGERED_BY=${{ github.actor }}" >> $GITHUB_ENV
-          fi
-
       - name: Notify Slack
         if: always()
         env:
@@ -152,6 +143,7 @@ jobs:
             CURRENT_TIME: ${{ env.CURRENT_TIME }}
             COMMIT_HASH: ${{ github.sha }}
             BRANCH: ${{ github.ref_name }}
+            ENVIRONMENT: ${{ env.ENVIRONMENT }}
             TRIGGERED_BY: ${{ env.TRIGGERED_BY }}
         run: |
             STATUS="Success"
@@ -160,20 +152,10 @@ jobs:
               STATUS="Failure"
               COLOR="danger"
             fi
-            if [[ "${{ github.event_name }}" == "schedule" ]]; then
-              echo "cron_run=true" >> $GITHUB_ENV
-            else
-              echo "cron_run=false" >> $GITHUB_ENV
-            fi
-            if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-              echo "manual_test=true" >> $GITHUB_ENV
-            else
-              echo "manual_test=false" >> $GITHUB_ENV
-            fi
             TEST_TYPE=""
-            if [[ "${{ env.cron_run }}" == "true" ]]; then
+            if [[ "${{ github.event_name }}" == "schedule" ]]; then
               TEST_TYPE="Ran Automated Cron monitoring on Prod at ${CURRENT_TIME}"
-            elif [[ "${{ env.manual_test }}" == "true" ]]; then
+            elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
               TEST_TYPE="Ran Manual Test on ${ENVIRONMENT} at ${CURRENT_TIME}"
             else
               TEST_TYPE="Triggered by ${TRIGGERED_BY} on ${ENVIRONMENT}"
@@ -183,7 +165,6 @@ jobs:
               --arg job_status "$STATUS" \
               --arg branch "$BRANCH" \
               --arg commit_hash "$COMMIT_HASH" \
-              --arg triggered_by "$TRIGGERED_BY" \
               --arg current_time "$CURRENT_TIME" \
               --arg playwright_report_url "<$PLAYWRIGHT_REPORT_URL>" \
               --arg color "$COLOR" \
@@ -191,7 +172,7 @@ jobs:
                 text: "*Regression Testing: \($job_status)*",
                 attachments: [
                   {
-                    text: "*Test Type*: \($test_type)\n*Branch*: \($branch)\n*Commit Hash*: \($commit_hash)\n*Triggered By*: \($triggered_by)\n*Test Run Time*: \($current_time)\n*Playwright Test Report URL*: \($playwright_report_url)",
+                    text: "*Test Type*: \($test_type)\n*Branch*: \($branch)\n*Commit Hash*: \($commit_hash)\n*Test Run Time*: \($current_time)\n*Playwright Test Report URL*: \($playwright_report_url)",
                     color: "\($color)"
                   }
                 ]
