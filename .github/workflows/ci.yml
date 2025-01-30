@@ -156,37 +156,28 @@ jobs:
         run: |
             STATUS="Success"
             COLOR="good"
-  
-            # Check job status
             if [[ "${{ job.status }}" == "failure" ]]; then
               STATUS="Failure"
               COLOR="danger"
             fi
-  
-            # Determine if it's a cron job
             if [[ "${{ github.event_name }}" == "schedule" ]]; then
               echo "cron_run=true" >> $GITHUB_ENV
             else
               echo "cron_run=false" >> $GITHUB_ENV
             fi
-  
-            # Determine if it's a manual test trigger
             if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
               echo "manual_test=true" >> $GITHUB_ENV
             else
               echo "manual_test=false" >> $GITHUB_ENV
             fi
-  
-            # Construct the message dynamically based on job status and other variables
             TEST_TYPE=""
             if [[ "${{ env.cron_run }}" == "true" ]]; then
               TEST_TYPE="Ran Automated Cron monitoring on Prod at ${CURRENT_TIME}"
             elif [[ "${{ env.manual_test }}" == "true" ]]; then
               TEST_TYPE="Ran Manual Test on ${ENVIRONMENT} at ${CURRENT_TIME}"
             else
-              TEST_TYPE="Triggered by ${TRIGGERED_BY}"
+              TEST_TYPE="Triggered by ${TRIGGERED_BY} on ${ENVIRONMENT}"
             fi
-  
             SLACK_MESSAGE=$(jq -n \
               --arg test_type "$TEST_TYPE" \
               --arg job_status "$STATUS" \
@@ -194,16 +185,15 @@ jobs:
               --arg commit_hash "$COMMIT_HASH" \
               --arg triggered_by "$TRIGGERED_BY" \
               --arg current_time "$CURRENT_TIME" \
-              --arg playwright_report_url "$PLAYWRIGHT_REPORT_URL" \
+              --arg playwright_report_url "<$PLAYWRIGHT_REPORT_URL>" \
               --arg color "$COLOR" \
             '{
                 text: "*Regression Testing: \($job_status)*",
                 attachments: [
                   {
-                    text: "*Test Type*: \($test_type)\n*Job Status*: \($job_status)\n*Branch*: \($branch)\n*Commit Hash*: \($commit_hash)\n*Triggered By*: \($triggered_by)\n*Test Run Time*: \($current_time)\n*Playwright Test Report URL*: \($playwright_report_url)",
+                    text: "*Test Type*: \($test_type)\n*Branch*: \($branch)\n*Commit Hash*: \($commit_hash)\n*Triggered By*: \($triggered_by)\n*Test Run Time*: \($current_time)\n*Playwright Test Report URL*: \($playwright_report_url)",
                     color: "\($color)"
                   }
                 ]
             }')
-  
             curl -X POST -H 'Content-type: application/json' --data "${SLACK_MESSAGE}" $SLACK_WEBHOOK_URL

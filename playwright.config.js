@@ -1,6 +1,5 @@
 // @ts-check
 const { defineConfig, devices } = require('@playwright/test');
-
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -35,7 +34,7 @@ module.exports = defineConfig({
     //   height: 1080
     // },
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.BASE_URL || 'https://app.composio.dev', 
+    // baseURL: process.env.BASE_URL || 'https://app.composio.dev', 
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     navigationTimeout: 300000,

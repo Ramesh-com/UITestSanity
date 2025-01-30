@@ -7,11 +7,13 @@ test.describe.serial('Regression test suite', () => {
     let browser;
     let context;
     let page;
+    let baseURL = process.env.BASE_URL || 'https://app.composio.dev';
   test('checking application login functionality', async ()=> {
     browser = await chromium.launch({ headless: process.env.HEADLESS === 'true' || false });
     context = await browser.newContext(); 
     page = await context.newPage();
-    await page.goto('/');
+    console.log(`Running test on ${baseURL}`);
+    await page.goto(baseURL);
     await page.fill('input[type="email"]', process.env.USER_EMAIL);
     await page.click("//button[.='Continue with email']"); 
     const client = await authorize();

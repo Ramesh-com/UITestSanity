@@ -1,6 +1,6 @@
 # Composio Regression Tests Automation
 
-This peoject automates the regression test cases to perform the daily regression to check all the possible business use-case scenarios in order to check, if the has not any broken scenarios.
+This project automates the regression test cases to perform the daily regression to check all the possible business use-case scenarios in order to check, if the has not any broken scenarios.
 ## Prerequisites
 
 1. **Node.js**: Make sure you have Node.js installed. You can download it from [here](https://nodejs.org/).
@@ -21,10 +21,7 @@ git clone https://github.com/ramesh-com/uitestsanity.git
 Create a `.env` file in the root directory with the following content:
  - USER_EMAIL= <your_email_id>
  - HEADLESS= <'true / false '>  # 'true' for headless and 'false' for headed mode
- - PROD_URL= <production-url>
- - STAGING_URL= <staging-url>
- - LOCAL_URL= <local-url>
-
+ 
 ### 4. Set Up Gmail OAuth
 
 You need to configure Gmail OAuth to handle email verification.
