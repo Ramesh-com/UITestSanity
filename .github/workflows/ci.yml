@@ -1,148 +1,148 @@
-name: Regression Test Status
+# name: Regression Test Status
 
-on:
-  schedule:
-    - cron: "*/30 * * * *"
-  push:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Which environment to run the tests on (prod, staging, local)'
-        required: true
-        default: 'prod'
-        type: choice
-        options:
-          - prod
-          - staging
-          - local
+# on:
+#   schedule:
+#     - cron: "*/30 * * * *"
+#   push:
+#   workflow_dispatch:
+#     inputs:
+#       environment:
+#         description: 'Which environment to run the tests on (prod, staging, local)'
+#         required: true
+#         default: 'prod'
+#         type: choice
+#         options:
+#           - prod
+#           - staging
+#           - local
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: '20'
 
-      - name: Install Dependencies
-        run: npm install
+#       - name: Install Dependencies
+#         run: npm install
 
-      - name: Install Playwright Browsers
-        run: npx playwright install chromium
+#       - name: Install Playwright Browsers
+#         run: npx playwright install chromium
 
-      - name: Set Environment Based on User Input (Manual Trigger)
-        id: set-env
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "ENVIRONMENT=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
-          else
-            echo "ENVIRONMENT=prod" >> $GITHUB_ENV
-          fi
+#       - name: Set Environment Based on User Input (Manual Trigger)
+#         id: set-env
+#         run: |
+#           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+#             echo "ENVIRONMENT=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+#           else
+#             echo "ENVIRONMENT=prod" >> $GITHUB_ENV
+#           fi
 
-      - name: Run Playwright Tests
-        env:
-          USER_EMAIL: ${{ vars.USER_EMAIL }}
-          HEADLESS: 'true'
-          ENVIRONMENT: ${{ env.ENVIRONMENT }}
-          MAILOSAUR_API_KEY: ${{ secrets.MAILOSAUR_API_KEY }}
-          MAILOSAUR_SERVER_ID: ${{ secrets.MAILOSAUR_SERVER_ID}}
-        run: |
-          echo "Running Playwright tests on environment: $ENVIRONMENT"
-          npm run test:$ENVIRONMENT
+#       - name: Run Playwright Tests
+#         env:
+#           USER_EMAIL: ${{ vars.USER_EMAIL }}
+#           HEADLESS: 'true'
+#           ENVIRONMENT: ${{ env.ENVIRONMENT }}
+#           MAILOSAUR_API_KEY: ${{ secrets.MAILOSAUR_API_KEY }}
+#           MAILOSAUR_SERVER_ID: ${{ secrets.MAILOSAUR_SERVER_ID}}
+#         run: |
+#           echo "Running Playwright tests on environment: $ENVIRONMENT"
+#           npm run test:$ENVIRONMENT
 
-      - name: Upload Playwright Test Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-results
-          path: test-results/
+#       - name: Upload Playwright Test Results
+#         if: always()
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: playwright-results
+#           path: test-results/
 
-      - name: Upload Playwright Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: playwright-report/
+#       - name: Upload Playwright Report
+#         if: always()
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: playwright-report
+#           path: playwright-report/
 
-      - name: Upload coverage folder to R2
-        if: ${{ failure() || success() }}
-        uses: himanshu-dixit/r2-upload-action-parallel@v1.3
-        with:
-          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
-          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
-          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          r2-bucket: github-action
-          source-dir: playwright-report
-          destination-dir: coverage-${{ github.run_id }}/coverage
+#       - name: Upload coverage folder to R2
+#         if: ${{ failure() || success() }}
+#         uses: himanshu-dixit/r2-upload-action-parallel@v1.3
+#         with:
+#           r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+#           r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+#           r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+#           r2-bucket: github-action
+#           source-dir: playwright-report
+#           destination-dir: coverage-${{ github.run_id }}/coverage
 
-      - name: Print unique URL
-        if: ${{ failure() || success() }}
-        run: |
-          echo "PLAYWRIGHT_REPORT_URL: 'https://pub-92e668239ab84bfd80ee07d61e9d2f40.r2.dev/coverage-${{ github.run_id }}/coverage/index.html'"
+#       - name: Print unique URL
+#         if: ${{ failure() || success() }}
+#         run: |
+#           echo "PLAYWRIGHT_REPORT_URL: 'https://pub-92e668239ab84bfd80ee07d61e9d2f40.r2.dev/coverage-${{ github.run_id }}/coverage/index.html'"
 
-      - name: Print HTML report folder unique URL
-        if: ${{ failure() || success() }}
-        run: |
-          echo "PLAYWRIGHT_REPORT_URL=https://pub-92e668239ab84bfd80ee07d61e9d2f40.r2.dev/coverage-${{ github.run_id }}/coverage/index.html" >> $GITHUB_ENV
+#       - name: Print HTML report folder unique URL
+#         if: ${{ failure() || success() }}
+#         run: |
+#           echo "PLAYWRIGHT_REPORT_URL=https://pub-92e668239ab84bfd80ee07d61e9d2f40.r2.dev/coverage-${{ github.run_id }}/coverage/index.html" >> $GITHUB_ENV
 
-      - name: Find Comment
-        if: ${{ failure() || success() }}
-        uses: peter-evans/find-comment@v3
-        id: fc
-        continue-on-error: true
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: This comment was generated by github-actions[bot]! for hermes unit tests
+#       - name: Find Comment
+#         if: ${{ failure() || success() }}
+#         uses: peter-evans/find-comment@v3
+#         id: fc
+#         continue-on-error: true
+#         with:
+#           issue-number: ${{ github.event.pull_request.number }}
+#           comment-author: 'github-actions[bot]'
+#           body-includes: This comment was generated by github-actions[bot]! for hermes unit tests
 
-      - name: Set current time
-        id: current_time
-        run: echo "CURRENT_TIME=$(date +"%d-%b-%y %H:%M:%S")" >> $GITHUB_ENV
+#       - name: Set current time
+#         id: current_time
+#         run: echo "CURRENT_TIME=$(date +"%d-%b-%y %H:%M:%S")" >> $GITHUB_ENV
 
-      - name: Notify Slack
-        if: always()
-        env:
-            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-            PLAYWRIGHT_REPORT_URL: ${{ env.PLAYWRIGHT_REPORT_URL }}
-            CURRENT_TIME: ${{ env.CURRENT_TIME }}
-            COMMIT_HASH: ${{ github.sha }}
-            BRANCH: ${{ github.ref_name }}
-            ENVIRONMENT: ${{ env.ENVIRONMENT }}
-        run: |
-            STATUS="Success"
-            COLOR="good"
-            if [[ "${{ job.status }}" == "failure" ]]; then
-              STATUS="Failure"
-              COLOR="danger"
-            fi
-            TEST_TYPE=""
-            if [[ "${{ github.event_name }}" == "schedule" ]]; then
-              TEST_TYPE="Ran Automated Cron monitoring on Prod at ${CURRENT_TIME}"
-            elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-              TEST_TYPE="Ran Manual Test on ${ENVIRONMENT} at ${CURRENT_TIME}"
-            else
-              TEST_TYPE="Triggered by push-event on ${ENVIRONMENT} at ${CURRENT_TIME}"
-            fi
-            SLACK_MESSAGE=$(jq -n \
-              --arg test_type "$TEST_TYPE" \
-              --arg job_status "$STATUS" \
-              --arg branch "$BRANCH" \
-              --arg commit_hash "$COMMIT_HASH" \
-              --arg current_time "$CURRENT_TIME" \
-              --arg playwright_report_url "<$PLAYWRIGHT_REPORT_URL>" \
-              --arg color "$COLOR" \
-            '{
-                text: "*Regression Testing: \($job_status)*",
-                attachments: [
-                  {
-                    text: "*Test Type*: \($test_type)\n*Branch*: \($branch)\n*Commit Hash*: \($commit_hash)\n*Test Run Time*: \($current_time)\n*Playwright Test Report URL*: \($playwright_report_url)",
-                    color: "\($color)"
-                  }
-                ]
-            }')
-            curl -X POST -H 'Content-type: application/json' --data "${SLACK_MESSAGE}" $SLACK_WEBHOOK_URL
+#       - name: Notify Slack
+#         if: always()
+#         env:
+#             SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#             PLAYWRIGHT_REPORT_URL: ${{ env.PLAYWRIGHT_REPORT_URL }}
+#             CURRENT_TIME: ${{ env.CURRENT_TIME }}
+#             COMMIT_HASH: ${{ github.sha }}
+#             BRANCH: ${{ github.ref_name }}
+#             ENVIRONMENT: ${{ env.ENVIRONMENT }}
+#         run: |
+#             STATUS="Success"
+#             COLOR="good"
+#             if [[ "${{ job.status }}" == "failure" ]]; then
+#               STATUS="Failure"
+#               COLOR="danger"
+#             fi
+#             TEST_TYPE=""
+#             if [[ "${{ github.event_name }}" == "schedule" ]]; then
+#               TEST_TYPE="Ran Automated Cron monitoring on Prod at ${CURRENT_TIME}"
+#             elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+#               TEST_TYPE="Ran Manual Test on ${ENVIRONMENT} at ${CURRENT_TIME}"
+#             else
+#               TEST_TYPE="Triggered by push-event on ${ENVIRONMENT} at ${CURRENT_TIME}"
+#             fi
+#             SLACK_MESSAGE=$(jq -n \
+#               --arg test_type "$TEST_TYPE" \
+#               --arg job_status "$STATUS" \
+#               --arg branch "$BRANCH" \
+#               --arg commit_hash "$COMMIT_HASH" \
+#               --arg current_time "$CURRENT_TIME" \
+#               --arg playwright_report_url "<$PLAYWRIGHT_REPORT_URL>" \
+#               --arg color "$COLOR" \
+#             '{
+#                 text: "*Regression Testing: \($job_status)*",
+#                 attachments: [
+#                   {
+#                     text: "*Test Type*: \($test_type)\n*Branch*: \($branch)\n*Commit Hash*: \($commit_hash)\n*Test Run Time*: \($current_time)\n*Playwright Test Report URL*: \($playwright_report_url)",
+#                     color: "\($color)"
+#                   }
+#                 ]
+#             }')
+#             curl -X POST -H 'Content-type: application/json' --data "${SLACK_MESSAGE}" $SLACK_WEBHOOK_URL
