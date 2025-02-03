@@ -49,6 +49,8 @@ jobs:
           USER_EMAIL: ${{ vars.USER_EMAIL }}
           HEADLESS: 'true'
           ENVIRONMENT: ${{ env.ENVIRONMENT }}
+          MAILOSAUR_API_KEY: ${{ secrets.MAILOSAUR_API_KEY }}
+          MAILOSAUR_SERVER_ID: ${{ secrets.MAILOSAUR_SERVER_ID}}
         run: |
           echo "Running Playwright tests on environment: $ENVIRONMENT"
           npm run test:$ENVIRONMENT
