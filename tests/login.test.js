@@ -18,7 +18,7 @@ test.describe.serial('Regression test suite', () => {
     page = await context.newPage();
     console.log(`Running test on ${baseURL}`);
     await page.goto(baseURL);
-    await page.fill('input[type="email"]', process.env.SENT_TO_EMAIL);
+    await page.fill('input[type="email"]', sentToEmail);
     await page.click("//button[.='Continue with email']"); 
     const signInLink = await getSignInLink(mailosaurApiKey, mailosaurServerId, sentToEmail);
     await page.goto(signInLink);
