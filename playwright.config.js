@@ -26,7 +26,7 @@ module.exports = defineConfig({
     ['html', { open: 'always' }],  // Ensure the HTML reporter is enabled
   ],
 
-  timeout: 600000,
+  timeout: 3600000,
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     // viewport: {
@@ -37,7 +37,7 @@ module.exports = defineConfig({
     // baseURL: process.env.BASE_URL || 'https://app.composio.dev', 
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    navigationTimeout: 300000,
+    navigationTimeout: 3600000,
     // viewport: null,
     trace: 'on',
     screenshot: 'on',

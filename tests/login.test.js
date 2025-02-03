@@ -1,23 +1,26 @@
 import { test, expect, chromium } from '@playwright/test';
-import { getSignInLink, authorize } from '../utils/googleAuth';
+import { getSignInLink } from '../utils/mailosaur';
 import * as dotenv from 'dotenv';
-
 dotenv.config();
+
 test.describe.serial('Regression test suite', () => {
     let browser;
     let context;
     let page;
     let baseURL = process.env.BASE_URL || 'https://app.composio.dev';
+    const mailosaurApiKey = process.env.MAILOSAUR_API_KEY;
+    const mailosaurServerId = process.env.MAILOSAUR_SERVER_ID;
+    const sentToEmail = process.env.USER_EMAIL;
+
   test('checking application login functionality', async ()=> {
     browser = await chromium.launch({ headless: process.env.HEADLESS === 'true' || false });
     context = await browser.newContext(); 
     page = await context.newPage();
     console.log(`Running test on ${baseURL}`);
     await page.goto(baseURL);
-    await page.fill('input[type="email"]', process.env.USER_EMAIL);
+    await page.fill('input[type="email"]', process.env.SENT_TO_EMAIL);
     await page.click("//button[.='Continue with email']"); 
-    const client = await authorize();
-    const signInLink = await getSignInLink(client);
+    const signInLink = await getSignInLink(mailosaurApiKey, mailosaurServerId, sentToEmail);
     await page.goto(signInLink);
     console.log('logging into the application...');
     await page.waitForLoadState("networkidle");
