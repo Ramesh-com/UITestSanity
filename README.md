@@ -19,27 +19,12 @@ git clone https://github.com/ramesh-com/uitestsanity.git
 ### 3. Configure Environment Variables
 
 Create a `.env` file in the root directory with the following content:
- - USER_EMAIL= <your_email_id>
+ - USER_EMAIL= <your_mailosaur_email_id>
+ - MAILOSAUR_API_KEY= <your-mailosaur-api-key>
+ - MAILOSAUR_SERVER_ID= <your-mailosaur-server-id>
  - HEADLESS= <'true / false '>  # 'true' for headless and 'false' for headed mode
  
-### 4. Set Up Gmail OAuth
-
-You need to configure Gmail OAuth to handle email verification.
-
-#### Step 1: Enable Gmail API
-
-- Go to the [Google Cloud Console](https://console.developers.google.com/).
-- Create a new project.
-- Navigate to the **API & Services** > **Library**.
-- Enable the **Gmail API**.
-
-#### Step 2: Create OAuth 2.0 Credentials
-
-- Navigate to **API & Services** > **Credentials**.
-- Create OAuth 2.0 credentials and download the `credentials.json` file.
-- Place the `credentials.json` file in the root directory of your project.
-
-### 5. Running Tests
+### 4. Running Tests
 You can run the tests using the following command:
 
 - To run in chrome browser 
@@ -47,6 +32,6 @@ You can run the tests using the following command:
     - npm run test:staging #To run tests on Staging-env
     - npm run test:local  #To run tests on local-env  
 
-### 6. View Test Results
+### 5. View Test Results
 Test results are automatically generated in the `test-results/` folder. You can also view the HTML report using:
     - npx playwright show-report

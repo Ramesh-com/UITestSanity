@@ -35,39 +35,6 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install chromium
 
-      - name: Create credentials.json
-        run: |
-          cat <<EOF > credentials.json
-          {
-              "web": {
-                  "client_id": "${{secrets.CLIENT_ID}}",
-                  "project_id": "${{secrets.PROJECT_ID}}",
-                  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                  "token_uri": "https://oauth2.googleapis.com/token",
-                  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                  "client_secret": "${{secrets.CLIENT_SECRET}}",
-                  "redirect_uris": ["http://localhost/redirect"],
-                  "javascript_origins": ["http://localhost"]
-              }
-          }
-          EOF
-        shell: bash
-
-      - name: Create token.json
-        run: |
-          cat <<EOF > token.json
-          {
-              "type": "authorized_user",
-              "client_id": "${{secrets.CLIENT_ID}}",
-              "client_secret": "${{secrets.CLIENT_SECRET}}",
-              "refresh_token": "${{secrets.REFRESH_TOKEN}}"
-          }
-          EOF
-        shell: bash
-
-      - name: Secure OAuth Credentials
-        run: chmod 600 credentials.json token.json
-
       - name: Set Environment Based on User Input (Manual Trigger)
         id: set-env
         run: |
