@@ -2,6 +2,7 @@
   "name": "composio-github-integration",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test:staging": "BASE_URL=https://staging-app.composio.dev npx playwright test",
     "test:prod": "BASE_URL=https://app.composio.dev npx playwright test",

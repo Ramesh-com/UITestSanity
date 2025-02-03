@@ -1,4 +1,4 @@
-const MailosaurClient = require("mailosaur");
+import MailosaurClient from "mailosaur";
 
 async function getSignInLink(mailosaurApiKey, mailosaurServerId, sentToEmail) {
   const mailosaurClient = new MailosaurClient(mailosaurApiKey);
@@ -44,4 +44,5 @@ async function getSignInLink(mailosaurApiKey, mailosaurServerId, sentToEmail) {
     }, interval);
   });
 }
-module.exports = { getSignInLink };
+
+export { getSignInLink }
