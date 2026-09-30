@@ -1,0 +1,1 @@
+sanity test cases for stagu=ing app tests
